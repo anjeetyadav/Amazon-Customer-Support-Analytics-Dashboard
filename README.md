@@ -1,4 +1,4 @@
-# Amazon Customer Support Analytics Dashboard | Power BI
+# Amazon Customer Support Analytics Dashboard 
 
 ## Overview
 
