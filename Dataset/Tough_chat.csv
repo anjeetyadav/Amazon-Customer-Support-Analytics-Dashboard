@@ -1,0 +1,11 @@
+Tough_Chat,count(issue_type)
+"Stuck in Shipment",404
+"Item Missing",386
+"Refund Not Received",384
+"Order Cancelled Issue",229
+"Wrong Amount Charged",221
+"Payment Failed",216
+"Account Locked",206
+"Unknown Charge",198
+"Whole Package Missing",134
+"Delivered Not Received",122
