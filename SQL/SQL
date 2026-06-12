@@ -1,0 +1,67 @@
+USE cx_operations_analytics_db;
+ SELECT 
+    csa_name,
+    COUNT(chat_id) AS total_chats,
+    SUM(CASE 
+            WHEN Issue_resolved_review = 'yes' THEN 1 
+            ELSE 0 
+        END) AS YES_chats,
+         SUM(CASE 
+            WHEN Issue_resolved_review = 'no' THEN 1 
+            ELSE 0 
+        END) AS NO_chats,
+            SUM(CASE WHEN Status_of_chat = 'transfer' THEN 1 ELSE 0 END) AS transfer_count,
+    SUM(CASE WHEN Status_of_chat = 'parked' THEN 1 ELSE 0 END) AS park_count,
+        ROUND(AVG(chat_duration), 2) AS avg_chat_duration,
+    SUM(CASE WHEN concession_given = 'yes' THEN 1 ELSE 0 END) AS concession_count,
+ROUND(
+        100.0 *
+        SUM(CASE WHEN concession_given = 'yes' THEN 1 ELSE 0 END)
+        /
+        COUNT(chat_id),
+    2) AS concession_rate,
+     ROUND(
+        100.0 * 
+        SUM(CASE WHEN Status_of_chat = 'parked' THEN 1 ELSE 0 END)
+        / COUNT(chat_id),
+    2) AS park_rate,
+     ROUND(
+        100.0 * 
+        SUM(CASE WHEN Status_of_chat = 'transfer' THEN 1 ELSE 0 END)
+        / COUNT(chat_id),
+    2) AS transfer_rate,
+
+         ROUND(
+        100.0 * 
+        SUM(CASE WHEN Issue_resolved_review = 'yes' THEN 1 ELSE 0 END)
+        /
+        (
+            SUM(CASE WHEN Issue_resolved_review = 'yes' THEN 1 ELSE 0 END) +
+            SUM(CASE WHEN Issue_resolved_review = 'no' THEN 1 ELSE 0 END)
+        ),
+    2) AS score,
+    CASE 
+        WHEN 
+            100.0 *
+            SUM(CASE WHEN Issue_resolved_review = 'yes' THEN 1 ELSE 0 END)
+            /
+            NULLIF(
+                SUM(CASE WHEN Issue_resolved_review IN ('yes','no') THEN 1 ELSE 0 END),
+            0) > 80 
+        THEN 'Green'
+
+        WHEN 
+            100.0 *
+            SUM(CASE WHEN Issue_resolved_review = 'yes' THEN 1 ELSE 0 END)
+            /
+            NULLIF(
+                SUM(CASE WHEN Issue_resolved_review IN ('yes','no') THEN 1 ELSE 0 END),
+            0) > 78
+        THEN 'Yellow'
+
+        ELSE 'Red'
+    END AS performance_band
+
+FROM modified_chat_review
+GROUP BY csa_name
+ORDER BY total_chats DESC;
